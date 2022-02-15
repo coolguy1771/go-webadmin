@@ -21,9 +21,13 @@ func main() {
 	flag.StringVar(&path, "path", "", "Specify path for SteamCMD.")
 	flag.Parse()
 	downloadSteamCMD(path)
+	downloadArma(path, username, password)
+	startArmaServer()
+	stopArmaServer()
+
 }
 
-var path = "tcp-control-panel"
+var path string
 var username string
 var password string
 
@@ -33,7 +37,7 @@ func downloadSteamCMD(path string) {
 	home, _ := os.UserHomeDir()
 	err := os.Chdir(filepath.Join(home, path))
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	//Print out path to confirm correct path
@@ -52,19 +56,19 @@ func downloadSteamCMD(path string) {
 		filename := "steamcmd.zip"
 		err := DownloadFile(filename, url)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 
 		log.Println("Downloaded SteamCMD Windows Version")
 
 		zipfile, err := os.Open(filename)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 
 		err = Untar("", zipfile)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 		log.Println("Installing SteamCMD")
 
@@ -74,7 +78,7 @@ func downloadSteamCMD(path string) {
 		install.Stdout = &out
 		err = install.Run()
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 		log.Println("SteamCMD Installed")
 	}
@@ -85,19 +89,19 @@ func downloadSteamCMD(path string) {
 		filename := "steamcmd_linux.tar.gz"
 		err := DownloadFile(filename, url)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 
 		log.Println("Downloaded SteamCMD Linux Version")
 
 		gzipfile, err := os.Open(filename)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 
 		err = Untar("", gzipfile)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 		log.Println("Installing SteamCMD")
 
@@ -107,7 +111,7 @@ func downloadSteamCMD(path string) {
 		install.Stdout = &out
 		err = install.Run()
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 		log.Println("SteamCMD Installed")
 	}
@@ -118,19 +122,19 @@ func downloadSteamCMD(path string) {
 		filename := "steamcmd_osx.tar.gz"
 		err := DownloadFile(filename, url)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 
 		log.Println("Downloaded SteamCMD MacOS Version")
 
 		gzipfile, err := os.Open(filename)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 
 		err = Untar("", gzipfile)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 		log.Println("Installing SteamCMD")
 
@@ -140,7 +144,7 @@ func downloadSteamCMD(path string) {
 		install.Stdout = &out
 		err = install.Run()
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 		log.Println("SteamCMD Installed")
 	}
@@ -152,7 +156,7 @@ func downloadArma(path string, username string, password string) {
 	home, _ := os.UserHomeDir()
 	err := os.Chdir(filepath.Join(home, path))
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	//Change dir to SteamCMD path
 	log.Println("Arma 3 Server Installing")
@@ -163,7 +167,7 @@ func downloadArma(path string, username string, password string) {
 	installArma.Stdout = &out
 	err = installArma.Run()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	log.Println("Arma 3 Server Installed")
 
@@ -175,7 +179,7 @@ func startArmaServer() {
 	home, _ := os.UserHomeDir()
 	err := os.Chdir(filepath.Join(home, path+"/arma3"))
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	log.Println("Starting Arma 3 Server")
 	installArma := exec.Command("./arma3server_x64")
@@ -183,7 +187,7 @@ func startArmaServer() {
 	installArma.Stdout = &out
 	err = installArma.Run()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	log.Println("Arma 3 Server Running")
 }
@@ -261,7 +265,7 @@ func Untar(dst string, r io.Reader) error {
 		// if its a dir and it doesn't exist create it
 		case tar.TypeDir:
 			if _, err := os.Stat(target); err != nil {
-				if err := os.MkdirAll(target, 0755); err != nil {
+				if err := os.MkdirAll(target, 0750); err != nil {
 					return err
 				}
 			}
